@@ -1,7 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	response, err := http.Get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
+
+	if err != nil {
+		fmt.Print(err.Error())
+		os.Exit(1)
+	}
+	responseData, err := io.ReadAll(response.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(string(responseData))
 }
