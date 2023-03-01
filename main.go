@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -8,8 +9,16 @@ import (
 	"os"
 )
 
+type TitleResponse struct {
+	Hits []Items	`json:"hits"`
+}
+
+type Items struct {
+	Title string `json:"title"`
+	Url string `json:"url"`
+}
 func main() {
-	response, err := http.Get("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty")
+	response, err := http.Get("https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=30&page=0")
 
 	if err != nil {
 		fmt.Print(err.Error())
@@ -20,5 +29,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(responseData))
+	var returnData TitleResponse
+
+	json.Unmarshal(responseData, &returnData)
+	for i := 0; i < len(returnData.Hits); i++ {
+		fmt.Printf("items %s %s\n", returnData.Hits[i].Title, returnData.Hits[i].Url)
+	}
 }
